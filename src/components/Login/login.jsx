@@ -51,7 +51,6 @@ export default function Login(props) {
         <input type="text" name="topic" id="topic" required ref={topic} />
         <label htmlFor="topic">Topic</label>
       </div>
-
       <div className="login_box">
         <input
           type="password"

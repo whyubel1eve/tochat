@@ -28,11 +28,10 @@ async fn start(window: Window, name: String, topic: String, relay: Multiaddr) {
     let window_clone2 = window.clone();
 
     // send a message to display chat component
-    window
-        .lock()
-        .unwrap()
-        .emit("connected", "successful")
-        .unwrap();
+    {
+        let lock = window.lock().unwrap();
+        lock.emit("connected", "successful").unwrap();
+    }
 
     // send messages to other peers
     let (tx1, rx1) = mpsc::channel::<String>(32);

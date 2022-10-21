@@ -1,12 +1,10 @@
 import TextField from "@mui/material/TextField";
 import { listen } from "@tauri-apps/api/event";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import "./display.css";
 import { appWindow } from "@tauri-apps/api/window";
 import multiavatar from "@multiavatar/multiavatar/esm";
 import { useLocation } from "react-router-dom";
-
-
 
 function Display() {
   const n1 = Math.random() * 10000;
@@ -44,17 +42,20 @@ function Display() {
     });
   };
 
-  receive();
+  useEffect(() => {
+    receive();
+  }, []);
 
+  const send = async (msg) => {
+    await appWindow.emit("send", { msg });
+  };
+  
   const handleKeyDown = (e) => {
     // "enter"
     if (e.keyCode === 13) {
       const msg = e.target.value;
       const date = new Date().toLocaleTimeString("en-US", { hour12: false });
 
-      const send = async (msg) => {
-        await appWindow.emit("send", { msg });
-      }
       // send msg to backend
       send(msg);
 
