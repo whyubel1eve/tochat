@@ -1,14 +1,10 @@
-import Display from "./components/Chat/display.jsx";
 import "./App.css";
+import routes from "./routes/index.jsx";
+import { useRoutes } from "react-router-dom";
 
 function App() {
- 
-  return (
-    <div>
-        <Display />
-    </div>
-  );
-
+  const element = useRoutes(routes);
+  return <div>{element}</div>;
 }
 
 export default App;

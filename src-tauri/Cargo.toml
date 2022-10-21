@@ -1,12 +1,12 @@
 [package]
 name = "chat"
 version = "0.0.0"
-description = "A Tauri App"
-authors = ["you"]
+description = "P2P chat app"
+authors = ["kennyissak@gmail.com"]
 license = ""
 repository = ""
 edition = "2021"
-rust-version = "1.57"
+rust-version = "1.63"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -18,6 +18,26 @@ serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 tauri = { version = "1.1", features = ["api-all"] }
 tokio = { version = "1", features = ["full"] }
+env_logger = "0.9.0"
+asynchronous-codec = "0.6"
+bytes = "1"
+either = "1.6.0"
+log = "0.4"
+futures = "0.3.1"
+futures-timer = "3"
+instant = "0.1.11"
+pin-project = "1"
+prost-codec = { version = "0.2" }
+prost = "0.11"
+rand = "0.8.4"
+smallvec = "1.6.1"
+static_assertions = "1"
+thiserror = "1.0"
+libp2p = { version = "0.48",  default-features = false, features = ["rendezvous", "kad", "yamux", "plaintext", "identify", "relay", "ping", "noise", "plaintext", "tcp-tokio", "dcutr", "dns-tokio", "gossipsub"]  }
+quickcheck = "1"
+chrono = "0.4"
+web3 = "0.17.0"
+secp256k1 = { version = "0.24.0", features = ["rand-std"] }
 [features]
 # by default Tauri runs in production mode
 # when `tauri dev` runs it is executed with `cargo run --no-default-features` if `devPath` is an URL
