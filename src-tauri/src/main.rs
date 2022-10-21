@@ -17,9 +17,9 @@ use crate::network::connection_channel::handle_msg;
 
 // init a background process on the command, and emit periodic events only to the window that used the command
 #[tauri::command]
-async fn start(window: Window, name: String, topic: String, relay: Multiaddr, key: String) {
-    // let key = get_secret();
-    let key = key;
+async fn start(window: Window, name: String, topic: String, relay: Multiaddr) {
+    let key = get_secret();
+    
     let swarm = establish_connection(&key, &topic, &relay).await;
 
     // crossed thread data

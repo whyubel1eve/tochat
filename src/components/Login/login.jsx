@@ -9,33 +9,29 @@ export default function Login(props) {
   const name = useRef(null);
   const topic = useRef(null);
   const relay = useRef(null);
-  const key = useRef(null);
 
   const navigate = useNavigate();
 
-  const start = async (appWindow, username, channelTopic, relayServer, secretKey) => {
+  const start = async (appWindow, username, channelTopic, relayServer) => {
     await invoke("start", {
       window: appWindow,
       name: username,
       topic: channelTopic,
       relay: relayServer,
-      key: secretKey,
     });
   };
 
   const connect = () => {
-
     const username = name.current.value;
     const channelTopic = topic.current.value;
     const relayServer = relay.current.value;
-    const secretKey = key.current.value;
 
     navigate("/progress");
 
-    start(appWindow, username, channelTopic, relayServer, secretKey);
+    start(appWindow, username, channelTopic, relayServer);
     const connected = async () => {
       await listen("connected", (event) => {
-        navigate("/display", { state: {name: username }});
+        navigate("/display", { state: { name: username } });
         alert(event.payload);
       });
     };
@@ -53,10 +49,6 @@ export default function Login(props) {
       <div className="login_box">
         <input type="text" name="topic" id="topic" required ref={topic} />
         <label htmlFor="topic">Topic</label>
-      </div>
-      <div className="login_box">
-        <input type="text" name="key" id="key" required ref={key} defaultValue="a1b059933d8a843fabd2c9a08dd824df292d974ce0f2ed0c08e14c4e38c79894" />
-        <label htmlFor="key">Key</label>
       </div>
       <div className="login_box">
         <input
