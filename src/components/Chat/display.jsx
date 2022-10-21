@@ -16,6 +16,7 @@ function Display() {
   const words = useRef(null);
   const location = useLocation();
   const { name } = location.state;
+  
 
   const receive = async () => {
     await listen("receive", (event) => {
@@ -42,20 +43,18 @@ function Display() {
     });
   };
 
-  useEffect(() => {
-    receive();
-  }, []);
 
-  const send = async (msg) => {
-    await appWindow.emit("send", { msg });
-  };
-  
+
   const handleKeyDown = (e) => {
     // "enter"
     if (e.keyCode === 13) {
       const msg = e.target.value;
       const date = new Date().toLocaleTimeString("en-US", { hour12: false });
 
+      const send = async (msg) => {
+        await appWindow.emit("send", { msg });
+      };
+      
       // send msg to backend
       send(msg);
 
@@ -84,6 +83,11 @@ function Display() {
     }
   };
 
+  useEffect(() => {
+    receive();
+  }, []);
+
+
   return (
     <div className="area">
       <div className="show" ref={words}>
@@ -99,7 +103,6 @@ function Display() {
           label="Message"
           variant="outlined"
           color="info"
-          // focused
           onKeyDown={handleKeyDown}
         />
       </div>
