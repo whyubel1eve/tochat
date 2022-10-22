@@ -115,7 +115,7 @@ pub async fn establish_connection(
     .multiplex(yamux::YamuxConfig::default())
     .boxed();
 
-    let topic = Topic::new(topic);
+    let topic_name = Topic::new(topic);
 
     // build swamr
     let mut swarm = {
@@ -132,7 +132,7 @@ pub async fn establish_connection(
         )
         .expect("configuration error");
 
-        gossip.subscribe(&topic).unwrap();
+        gossip.subscribe(&topic_name).unwrap();
 
         let behaviour = Behaviour {
             relay_client: client,
@@ -293,6 +293,7 @@ pub async fn establish_connection(
     // waiting for connection to be established
 
     let mut established = false;
+    let mut gossip_established = false;
     loop {
         match swarm.next().await.unwrap() {
             SwarmEvent::NewListenAddr { address, .. } => {
@@ -312,6 +313,14 @@ pub async fn establish_connection(
             SwarmEvent::Behaviour(Event::Identify(event)) => {
                 info!("{:?}", event)
             }
+            SwarmEvent::Behaviour(Event::Gossip(event)) => match event {
+                GossipsubEvent::Subscribed { peer_id: _, topic } => {
+                    if topic_name.to_string() == topic.to_string() {
+                        gossip_established = true;
+                    }
+                }
+                _ => {}
+            },
             SwarmEvent::Behaviour(Event::Ping(_)) => {}
             SwarmEvent::ConnectionEstablished {
                 peer_id, endpoint, ..
@@ -325,7 +334,7 @@ pub async fn establish_connection(
             _ => {}
         }
 
-        if established {
+        if established && gossip_established {
             break;
         }
     }
@@ -340,34 +349,37 @@ pub async fn handle_msg(
 ) {
     loop {
         tokio::select! {
-            // publish
-            msg = rx1.recv() => {
-                swarm.behaviour_mut()
-            .gossip
-            .publish(Topic::new(&topic), msg.unwrap().as_bytes())
-            .expect("publish error");
-            },
-            // receive
-            event = swarm.select_next_some() => {
-                match event {
-                    SwarmEvent::Behaviour(Event::Gossip(GossipsubEvent::Message{
-                        propagation_source: _,
-                        message_id: _,
-                        message,
-                    })) => {
-                        let message = String::from_utf8_lossy(&message.data);
-                        let tokens:Vec<&str> = message.split("*").collect();
-                        let remote_name = tokens[0];
-                        let content = tokens[1];
-                       
-                        tx2.send(format!("{} {} @{}",
-                                    remote_name,
-                                    Local::now().format("%H:%M:%S").to_string(),
-                                    content)).await.unwrap();
-                    }
-                    _ => {}
-                }
-            }
+                    // publish
+                    msg = rx1.recv() => {
+                       match swarm.behaviour_mut()
+                    .gossip
+                    .publish(Topic::new(&topic), msg.unwrap().as_bytes()) {
+            Ok(_) => {},
+            Err(_) => {},
         }
+
+                    },
+                    // receive
+                    event = swarm.select_next_some() => {
+                        match event {
+                            SwarmEvent::Behaviour(Event::Gossip(GossipsubEvent::Message{
+                                propagation_source: _,
+                                message_id: _,
+                                message,
+                            })) => {
+                                let message = String::from_utf8_lossy(&message.data);
+                                let tokens:Vec<&str> = message.split("*").collect();
+                                let remote_name = tokens[0];
+                                let content = tokens[1];
+
+                                tx2.send(format!("{} {} @{}",
+                                            remote_name,
+                                            Local::now().format("%H:%M:%S").to_string(),
+                                            content)).await.unwrap();
+                            }
+                            _ => {}
+                        }
+                    }
+                }
     }
 }
