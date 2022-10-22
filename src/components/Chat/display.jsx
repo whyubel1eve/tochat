@@ -7,22 +7,22 @@ import multiavatar from "@multiavatar/multiavatar/esm";
 import { useLocation } from "react-router-dom";
 
 function Display() {
-  const n1 = Math.random() * 10000;
-  const n2 = Math.random() * 10000;
-
-  const svgCode1 = multiavatar(n1);
-  const svgCode2 = multiavatar(n2);
 
   const words = useRef(null);
   const location = useLocation();
   const { name } = location.state;
-  
+
+  const svgCode_me = multiavatar(name);
 
   const receive = async () => {
     await listen("receive", (event) => {
       const all = event.payload.split("@");
       const message = JSON.parse(all[1]).msg;
       const info = all[0];
+
+      const name_forAvatar = info.split(" ")[0];
+
+      const svgCode_others = multiavatar(name_forAvatar);
 
       words.current.innerHTML =
         words.current.innerHTML +
@@ -31,7 +31,7 @@ function Display() {
         "</div>" +
         '<div class="atalk">' +
         '<div class="avatarA">' +
-        svgCode1 +
+        svgCode_others +
         "</div>" +
         "<span>" +
         message +
@@ -43,8 +43,6 @@ function Display() {
     });
   };
 
-
-
   const handleKeyDown = (e) => {
     // "enter"
     if (e.keyCode === 13) {
@@ -54,7 +52,7 @@ function Display() {
       const send = async (msg) => {
         await appWindow.emit("send", { msg });
       };
-      
+
       // send msg to backend
       send(msg);
 
@@ -71,7 +69,7 @@ function Display() {
         msg +
         "</span>" +
         '<div class="avatarB">' +
-        svgCode2 +
+        svgCode_me +
         "</div>" +
         "</div>";
 
@@ -86,7 +84,6 @@ function Display() {
   useEffect(() => {
     receive();
   }, []);
-
 
   return (
     <div className="area">
