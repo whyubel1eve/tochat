@@ -22,7 +22,6 @@ export default function Login(props) {
   };
 
   const connect = () => {
-
     const username = name.current.value;
     const channelTopic = topic.current.value;
     const relayServer = relay.current.value;
@@ -32,7 +31,7 @@ export default function Login(props) {
     start(appWindow, username, channelTopic, relayServer);
     const connected = async () => {
       await listen("connected", (event) => {
-        navigate("/display", { state: {name: username }});
+        navigate("/display", { state: { name: username } });
         alert(event.payload);
       });
     };
@@ -51,7 +50,6 @@ export default function Login(props) {
         <input type="text" name="topic" id="topic" required ref={topic} />
         <label htmlFor="topic">Topic</label>
       </div>
-
       <div className="login_box">
         <input
           type="password"

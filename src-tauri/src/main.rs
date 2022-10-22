@@ -3,7 +3,7 @@
     windows_subsystem = "windows"
 )]
 
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 
 use futures::executor::block_on;
 use libp2p::Multiaddr;
@@ -18,21 +18,18 @@ use crate::network::connection_channel::handle_msg;
 // init a background process on the command, and emit periodic events only to the window that used the command
 #[tauri::command]
 async fn start(window: Window, name: String, topic: String, relay: Multiaddr) {
-    // let key = get_secret();
     let key = get_secret();
+    
     let swarm = establish_connection(&key, &topic, &relay).await;
 
     // crossed thread data
-    let window = Arc::new(Mutex::new(window));
+    let window = Arc::new(window);
     let window_clone1 = window.clone();
     let window_clone2 = window.clone();
 
     // send a message to display chat component
-    window
-        .lock()
-        .unwrap()
-        .emit("connected", "successful")
-        .unwrap();
+
+   window.emit("connected", "successful").unwrap();
 
     // send messages to other peers
     let (tx1, rx1) = mpsc::channel::<String>(32);
@@ -40,17 +37,15 @@ async fn start(window: Window, name: String, topic: String, relay: Multiaddr) {
     let (tx2, mut rx2) = mpsc::channel::<String>(32);
 
     spawn(async move {
-        let lock = window_clone1.lock().unwrap();
-        lock.listen("send", move |event| {
+        window_clone1.listen("send", move |event| {
             block_on(tx1.send(format!("{}*{}", name, event.payload().unwrap().to_string())))
                 .unwrap();
         });
     });
     spawn(async move {
-        let lock = window_clone2.lock().unwrap();
         loop {
             while let Some(msg) = block_on(rx2.recv()) {
-                lock.emit("receive", msg).unwrap();
+                window_clone2.emit("receive", msg).unwrap();
             }
         }
     });

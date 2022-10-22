@@ -1,12 +1,10 @@
 import TextField from "@mui/material/TextField";
 import { listen } from "@tauri-apps/api/event";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import "./display.css";
 import { appWindow } from "@tauri-apps/api/window";
 import multiavatar from "@multiavatar/multiavatar/esm";
 import { useLocation } from "react-router-dom";
-
-
 
 function Display() {
   const n1 = Math.random() * 10000;
@@ -18,6 +16,7 @@ function Display() {
   const words = useRef(null);
   const location = useLocation();
   const { name } = location.state;
+  
 
   const receive = async () => {
     await listen("receive", (event) => {
@@ -44,7 +43,7 @@ function Display() {
     });
   };
 
-  receive();
+
 
   const handleKeyDown = (e) => {
     // "enter"
@@ -54,7 +53,8 @@ function Display() {
 
       const send = async (msg) => {
         await appWindow.emit("send", { msg });
-      }
+      };
+      
       // send msg to backend
       send(msg);
 
@@ -83,6 +83,11 @@ function Display() {
     }
   };
 
+  useEffect(() => {
+    receive();
+  }, []);
+
+
   return (
     <div className="area">
       <div className="show" ref={words}>
@@ -98,7 +103,6 @@ function Display() {
           label="Message"
           variant="outlined"
           color="info"
-          // focused
           onKeyDown={handleKeyDown}
         />
       </div>
