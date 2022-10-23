@@ -1,22 +1,23 @@
 import TextField from "@mui/material/TextField";
 import { listen } from "@tauri-apps/api/event";
-import { useEffect, useRef } from "react";
+import { MutableRefObject, useEffect, useRef } from "react";
 import "./display.css";
 import { appWindow } from "@tauri-apps/api/window";
 import multiavatar from "@multiavatar/multiavatar/esm";
-import { useLocation } from "react-router-dom";
+import { Location, useLocation } from "react-router-dom";
+
+type Avatar = string;
 
 function Display() {
-
-  const words = useRef(null);
-  const location = useLocation();
+  const words_ref: MutableRefObject<any> = useRef(null);
+  const location: Location = useLocation();
   const { name } = location.state;
 
-  const svgCode_me = multiavatar(name);
+  const svgCode_me: Avatar = multiavatar(name);
 
   const receive = async () => {
-    await listen("receive", (event) => {
-      const all = event.payload.split("@");
+    await listen("receive", (event: any) => {
+      const all: string[] = event.payload.split("@");
       const message = JSON.parse(all[1]).msg;
       const info = all[0];
 
@@ -24,8 +25,8 @@ function Display() {
 
       const svgCode_others = multiavatar(name_forAvatar);
 
-      words.current.innerHTML =
-        words.current.innerHTML +
+      words_ref.current.innerHTML =
+        words_ref.current.innerHTML +
         '<div class="infoA">' +
         info +
         "</div>" +
@@ -39,17 +40,17 @@ function Display() {
         "</div>";
 
       // scroll to the bottom
-      words.current.scrollTop = words.current.scrollHeight;
+      words_ref.current.scrollTop = words_ref.current.scrollHeight;
     });
   };
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: any) => {
     // "enter"
     if (e.keyCode === 13) {
-      const msg = e.target.value;
+      const msg: string = e.target.value;
       const date = new Date().toLocaleTimeString("en-US", { hour12: false });
 
-      const send = async (msg) => {
+      const send = async (msg: any) => {
         await appWindow.emit("send", { msg });
       };
 
@@ -57,8 +58,8 @@ function Display() {
       send(msg);
 
       // sender messages
-      words.current.innerHTML =
-        words.current.innerHTML +
+      words_ref.current.innerHTML =
+        words_ref.current.innerHTML +
         '<div class="infoB">' +
         name +
         "&nbsp;" +
@@ -74,7 +75,7 @@ function Display() {
         "</div>";
 
       // scroll to the bottom
-      words.current.scrollTop = words.current.scrollHeight;
+      words_ref.current.scrollTop = words_ref.current.scrollHeight;
 
       // reset input area
       e.target.value = "";
@@ -87,7 +88,7 @@ function Display() {
 
   return (
     <div className="area">
-      <div className="show" ref={words}>
+      <div className="show" ref={words_ref}>
         <div className="atalk"></div>
         <div className="btalk"></div>
       </div>
