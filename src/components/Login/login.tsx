@@ -8,27 +8,24 @@ import { NavigateFunction, useNavigate } from "react-router-dom";
 export default function Login() {
   const name_ref: MutableRefObject<any> = useRef(null);
   const topic_ref: MutableRefObject<any> = useRef(null);
-  const relay_ref: MutableRefObject<any> = useRef(null);
 
   const navigate: NavigateFunction = useNavigate();
 
-  const start = async (appWindow: WebviewWindow, username: string, channelTopic: string, relayServer: string) => {
+  const start = async (appWindow: WebviewWindow, username: string, channelTopic: string) => {
     await invoke("start", {
       window: appWindow,
       name: username,
       topic: channelTopic,
-      relay: relayServer,
     });
   };
 
   const connect = () => {
     const username: string = name_ref.current.value;
     const channelTopic: string = topic_ref.current.value;
-    const relayServer: string = relay_ref.current.value;
 
     navigate("/progress");
 
-    start(appWindow, username, channelTopic, relayServer);
+    start(appWindow, username, channelTopic);
     const connected = async () => {
       await listen("connected", (event: any) => {
         navigate("/display", { state: { name: username } });
@@ -49,18 +46,6 @@ export default function Login() {
       <div className="login_box">
         <input type="text" name="topic" id="topic" required ref={topic_ref} />
         <label htmlFor="topic">Topic</label>
-      </div>
-      <div className="login_box">
-        <input
-          type="password"
-          name="relay"
-          id="relay"
-          defaultValue="/ip4/1.12.76.121/tcp/4001/p2p/12D3KooWDpJ7As7BWAwRMfu1VU2WCqNjvq387JEYKDBj4kx6nXTN"
-          required
-          style={{ color: "grey" }}
-          ref={relay_ref}
-        />
-        <label htmlFor="relay">Relay</label>
       </div>
       <a href="#" onClick={connect}>
         login
