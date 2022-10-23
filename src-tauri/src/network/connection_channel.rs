@@ -84,7 +84,7 @@ impl From<rendezvous::client::Event> for Event {
 
 pub async fn establish_connection(
     key: &String,
-    topic: &String,
+    topic_name: &String,
     relay_address: &Multiaddr,
 ) -> Swarm<Behaviour> {
     let local_key = generate_ed25519(key);
@@ -115,7 +115,7 @@ pub async fn establish_connection(
     .multiplex(yamux::YamuxConfig::default())
     .boxed();
 
-    let topic_name = Topic::new(topic);
+    let topic = Topic::new(topic_name);
 
     // build swamr
     let mut swarm = {
@@ -132,7 +132,7 @@ pub async fn establish_connection(
         )
         .expect("configuration error");
 
-        gossip.subscribe(&topic_name).unwrap();
+        gossip.subscribe(&topic).unwrap();
 
         let behaviour = Behaviour {
             relay_client: client,
@@ -214,9 +214,10 @@ pub async fn establish_connection(
                 info!("Relay told us our public address: {:?}", observed_addr);
                 learned_observed_addr = true;
 
+
                 // default ttl is 7200s
                 swarm.behaviour_mut().rendezvous.register(
-                    rendezvous::Namespace::from_static("rendezvous"),
+                    rendezvous::Namespace::new(topic_name.clone()).unwrap(),
                     rendezvous_point,
                     None,
                 );
@@ -236,10 +237,10 @@ pub async fn establish_connection(
             SwarmEvent::ConnectionEstablished { peer_id, .. } if peer_id == rendezvous_point => {
                 info!(
                     "Connected to rendezvous point, discovering nodes in '{}' namespace ...",
-                    "rendezvous"
+                    topic_name
                 );
                 swarm.behaviour_mut().rendezvous.discover(
-                    Some(rendezvous::Namespace::new("rendezvous".to_string()).unwrap()),
+                    Some(rendezvous::Namespace::new(topic_name.clone()).unwrap()),
                     None,
                     None,
                     rendezvous_point,
