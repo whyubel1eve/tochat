@@ -1,21 +1,3 @@
-*{
-	/*初始化 清除页面元素的内外边距*/
-	padding: 0;
-	margin: 0;
-	/*盒子模型*/
-	box-sizing: border-box;
-}
-body {
-	/*弹性布局 让页面元素垂直+水平居中*/
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	/*让页面始终占浏览器可视区域总高度*/
-	height: 100vh;
-	/*背景渐变色*/
-	/* background: linear-gradient(#141e30,#243b55); */
-	background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-}
 .login{
 	/*弹性布局 让子元素称为弹性项目*/
 	display: flex;
@@ -27,7 +9,7 @@ body {
 	align-items: center;
 	width: 400px;
 	padding: 40px;
-	background-color: rgba(0, 0, 0, 0.2);
+	background-color: rgba(97, 90, 90, 0.2);
 	box-shadow: 0 15px 25px rgba(0, 0, 0, 0.4);
 
 }
@@ -81,7 +63,7 @@ body {
 .login .login_box input:focus + label,
 .login  .login_box input:valid + label{
 	top: -20px;
-	color: #03e9f4;
+	color: #0140c0;
 	font-size: 12px;
 }
 
@@ -89,7 +71,7 @@ body {
 	/*overflow: hidden;*/
 	position: relative;
 	padding: 10px 20px;
-	color: #03e9f4;
+	color: #0140c0;
 	/*取消a表现原有的下划线*/
 	text-decoration: none;
 	/*同样加个过渡*/
@@ -110,7 +92,7 @@ body {
 	width: 100%;
 	height: 2px;
 	/*to right 就是往右边 下面的同理*/
-	background: linear-gradient(to right,transparent,#03e9f4);
+	background: linear-gradient(to right,#4cc8fd,#ffa0d9);
 	/*动画 名称  时长 linear是匀速运动 infinite是无限次运动*/
 	animation: move1 1s linear infinite;
 
@@ -120,7 +102,7 @@ body {
 	top: -100%;
 	width: 2px;
 	height: 100%;
-	background: linear-gradient(transparent,#03e6f4);
+	background: linear-gradient(#ffa0d9,#4cc8fd);
 	/*这里多了个0.25s其实是延迟时间*/
 	animation: move2 1s linear 0.25s infinite;
 }
@@ -130,7 +112,7 @@ body {
 	bottom: 0;
 	width: 100%;
 	height: 2px;
-	background: linear-gradient(to left,transparent,#03e9f4);
+	background: linear-gradient(to left,#ffa0d9,#4cc8fd);
 
 	animation: move3 1s linear 0.5s infinite;
 }
@@ -140,7 +122,7 @@ body {
 	bottom: -100%;
 	width: 2px;
 	height: 100%;
-	background: linear-gradient(#03e9f4,transparent);
+	background: linear-gradient(#4cc8fd,#ffa0d9);
 	animation: move4 1s linear 0.75s infinite;
 }
 /*写一下动画 */

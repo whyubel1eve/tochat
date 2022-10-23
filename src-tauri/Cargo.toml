@@ -3,8 +3,8 @@ name = "chat"
 version = "0.0.1"
 description = "P2P instant messaging app"
 authors = ["kennyissak@gmail.com"]
-license = ""
-repository = ""
+license = "MIT"
+repository = "https://github.com/Collapssar/tochat"
 edition = "2021"
 rust-version = "1.63"
 

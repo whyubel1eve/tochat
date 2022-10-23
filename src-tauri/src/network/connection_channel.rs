@@ -84,7 +84,7 @@ impl From<rendezvous::client::Event> for Event {
 
 pub async fn establish_connection(
     key: &String,
-    topic: &String,
+    topic_name: &String,
     relay_address: &Multiaddr,
 ) -> Swarm<Behaviour> {
     let local_key = generate_ed25519(key);
@@ -115,7 +115,7 @@ pub async fn establish_connection(
     .multiplex(yamux::YamuxConfig::default())
     .boxed();
 
-    let topic = Topic::new(topic);
+    let topic = Topic::new(topic_name);
 
     // build swamr
     let mut swarm = {
@@ -214,9 +214,10 @@ pub async fn establish_connection(
                 info!("Relay told us our public address: {:?}", observed_addr);
                 learned_observed_addr = true;
 
+
                 // default ttl is 7200s
                 swarm.behaviour_mut().rendezvous.register(
-                    rendezvous::Namespace::from_static("rendezvous"),
+                    rendezvous::Namespace::new(topic_name.clone()).unwrap(),
                     rendezvous_point,
                     None,
                 );
@@ -236,10 +237,10 @@ pub async fn establish_connection(
             SwarmEvent::ConnectionEstablished { peer_id, .. } if peer_id == rendezvous_point => {
                 info!(
                     "Connected to rendezvous point, discovering nodes in '{}' namespace ...",
-                    "rendezvous"
+                    topic_name
                 );
                 swarm.behaviour_mut().rendezvous.discover(
-                    Some(rendezvous::Namespace::new("rendezvous".to_string()).unwrap()),
+                    Some(rendezvous::Namespace::new(topic_name.clone()).unwrap()),
                     None,
                     None,
                     rendezvous_point,
@@ -293,6 +294,7 @@ pub async fn establish_connection(
     // waiting for connection to be established
 
     let mut established = false;
+    let mut gossip_established = false;
     loop {
         match swarm.next().await.unwrap() {
             SwarmEvent::NewListenAddr { address, .. } => {
@@ -312,6 +314,14 @@ pub async fn establish_connection(
             SwarmEvent::Behaviour(Event::Identify(event)) => {
                 info!("{:?}", event)
             }
+            SwarmEvent::Behaviour(Event::Gossip(event)) => match event {
+                GossipsubEvent::Subscribed { peer_id: _, topic } => {
+                    if topic_name.to_string() == topic.to_string() {
+                        gossip_established = true;
+                    }
+                }
+                _ => {}
+            },
             SwarmEvent::Behaviour(Event::Ping(_)) => {}
             SwarmEvent::ConnectionEstablished {
                 peer_id, endpoint, ..
@@ -325,7 +335,7 @@ pub async fn establish_connection(
             _ => {}
         }
 
-        if established {
+        if established && gossip_established {
             break;
         }
     }
@@ -340,34 +350,37 @@ pub async fn handle_msg(
 ) {
     loop {
         tokio::select! {
-            // publish
-            msg = rx1.recv() => {
-                swarm.behaviour_mut()
-            .gossip
-            .publish(Topic::new(&topic), msg.unwrap().as_bytes())
-            .expect("publish error");
-            },
-            // receive
-            event = swarm.select_next_some() => {
-                match event {
-                    SwarmEvent::Behaviour(Event::Gossip(GossipsubEvent::Message{
-                        propagation_source: _,
-                        message_id: _,
-                        message,
-                    })) => {
-                        let message = String::from_utf8_lossy(&message.data);
-                        let tokens:Vec<&str> = message.split("*").collect();
-                        let remote_name = tokens[0];
-                        let content = tokens[1];
-                       
-                        tx2.send(format!("{} {} @{}",
-                                    remote_name,
-                                    Local::now().format("%H:%M:%S").to_string(),
-                                    content)).await.unwrap();
-                    }
-                    _ => {}
-                }
-            }
+                    // publish
+                    msg = rx1.recv() => {
+                       match swarm.behaviour_mut()
+                    .gossip
+                    .publish(Topic::new(&topic), msg.unwrap().as_bytes()) {
+            Ok(_) => {},
+            Err(_) => {},
         }
+
+                    },
+                    // receive
+                    event = swarm.select_next_some() => {
+                        match event {
+                            SwarmEvent::Behaviour(Event::Gossip(GossipsubEvent::Message{
+                                propagation_source: _,
+                                message_id: _,
+                                message,
+                            })) => {
+                                let message = String::from_utf8_lossy(&message.data);
+                                let tokens:Vec<&str> = message.split("*").collect();
+                                let remote_name = tokens[0];
+                                let content = tokens[1];
+
+                                tx2.send(format!("{} {}@{}",
+                                            remote_name,
+                                            Local::now().format("%H:%M:%S").to_string(),
+                                            content)).await.unwrap();
+                            }
+                            _ => {}
+                        }
+                    }
+                }
     }
 }
