@@ -46,7 +46,12 @@ function Display() {
 
   const handleKeyDown = (e: any) => {
     // "enter"
-    if (e.keyCode === 13) {
+    if (!e.shiftKey && e.keyCode === 13) {
+      // Don't make a line break when "enter"
+      e.cancelBubble=true;
+      e.preventDefault();
+      e.stopPropagation();
+
       const msg: string = e.target.value;
       const date = new Date().toLocaleTimeString("en-US", { hour12: false });
 
@@ -98,9 +103,10 @@ function Display() {
           helperText="Please enter your message"
           fullWidth={true}
           id="outlined-basic"
-          label="Message"
           variant="outlined"
           color="info"
+          multiline={true}
+          rows="2"
           onKeyDown={handleKeyDown}
         />
       </div>

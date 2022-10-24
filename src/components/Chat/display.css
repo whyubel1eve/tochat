@@ -4,8 +4,8 @@
 }
 .show {
   height: 400px;
-  border-radius: 10px;
-  border: 1px solid #666;
+  border-radius: 5px;
+  border: 1px solid rgb(168, 167, 167);
   background: #fff;
   margin: 30px auto 10px;
   overflow: auto;
