@@ -447,37 +447,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "chat"
-version = "0.0.1"
-dependencies = [
- "asynchronous-codec",
- "bytes",
- "chrono",
- "either",
- "env_logger 0.9.1",
- "futures",
- "futures-timer",
- "instant",
- "libp2p",
- "log",
- "pin-project",
- "prost",
- "prost-codec",
- "quickcheck",
- "rand 0.8.5",
- "secp256k1 0.24.0",
- "serde",
- "serde_json",
- "smallvec",
- "static_assertions",
- "tauri",
- "tauri-build",
- "thiserror",
- "tokio",
- "web3",
-]
-
-[[package]]
 name = "chrono"
 version = "0.4.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4759,6 +4728,37 @@ name = "tinyvec_macros"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cda74da7e1a664f795bb1f8a87ec406fb89a02522cf6e50620d016add6dbbf5c"
+
+[[package]]
+name = "tochat"
+version = "0.0.3"
+dependencies = [
+ "asynchronous-codec",
+ "bytes",
+ "chrono",
+ "either",
+ "env_logger 0.9.1",
+ "futures",
+ "futures-timer",
+ "instant",
+ "libp2p",
+ "log",
+ "pin-project",
+ "prost",
+ "prost-codec",
+ "quickcheck",
+ "rand 0.8.5",
+ "secp256k1 0.24.0",
+ "serde",
+ "serde_json",
+ "smallvec",
+ "static_assertions",
+ "tauri",
+ "tauri-build",
+ "thiserror",
+ "tokio",
+ "web3",
+]
 
 [[package]]
 name = "tokio"
