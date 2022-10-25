@@ -25,8 +25,7 @@
       "icon": [
         "icons/tochat.png",
         "icons/tochat-full.png",
-        "icons/icon.png",
-        "icons/icon.ico"
+        "icons/icon.png"
       ],
       "identifier": "com.issak",
       "longDescription": "",
