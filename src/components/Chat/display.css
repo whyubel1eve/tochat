@@ -1,9 +1,9 @@
 .area {
   margin: auto;
-  width: 600px;
+  width: 660px;
 }
 .show {
-  height: 400px;
+  height: 420px;
   border-radius: 5px;
   border: 1px solid rgb(168, 167, 167);
   background: #fff;
@@ -14,7 +14,8 @@
 }
 .atalk {
   margin: 10px;
-  word-wrap: break-word;
+  margin-bottom: 15px;
+  text-align: left;
 }
 .atalk span {
   display: inline-block;
@@ -27,6 +28,7 @@
 }
 .btalk {
   margin: 10px;
+  margin-bottom: 15px;
   text-align: right;
 }
 .btalk span {
@@ -40,14 +42,14 @@
   word-wrap: break-word;
 }
 .avatarA {
-  height: 45px;
-  width: 55px;
+  height: 40px;
+  width: 50px;
   float: left;
   padding-right: 10px;
 }
 .avatarB {
-  height: 45px;
-  width: 55px;
+  height: 40px;
+  width: 50px;
   float: right;
   padding-left: 10px;
 }

@@ -1,10 +1,11 @@
 import TextField from "@mui/material/TextField";
 import { listen } from "@tauri-apps/api/event";
-import { MutableRefObject, useEffect, useRef } from "react";
+import { MutableRefObject, useEffect, useRef, useState } from "react";
 import "./display.css";
 import { appWindow } from "@tauri-apps/api/window";
 import multiavatar from "@multiavatar/multiavatar/esm";
 import { Location, useLocation } from "react-router-dom";
+import Msg from "./Msg/msg";
 
 type Avatar = string;
 
@@ -12,6 +13,8 @@ function Display() {
   const words_ref: MutableRefObject<any> = useRef(null);
   const location: Location = useLocation();
   const { name } = location.state;
+
+  const [items, setItems]: any = useState([]);
 
   const svgCode_me: Avatar = multiavatar(name);
 
@@ -21,23 +24,23 @@ function Display() {
       const message = JSON.parse(all[1]).msg;
       const info = all[0];
 
-      const name_forAvatar = info.split(" ")[0];
+      const name_forAvatar = info.split("  ")[0];
+      const time = info.split("  ")[1];
 
       const svgCode_others = multiavatar(name_forAvatar);
 
-      words_ref.current.innerHTML =
-        words_ref.current.innerHTML +
-        '<div class="infoA">' +
-        info +
-        "</div>" +
-        '<div class="atalk">' +
-        '<div class="avatarA">' +
-        svgCode_others +
-        "</div>" +
-        "<span>" +
-        message +
-        "</span>" +
-        "</div>";
+      setItems((arr: any) => [
+        ...arr,
+        {
+          info: "infoA",
+          talk: "atalk",
+          avatar: "avatarA",
+          time: time,
+          message: message,
+          name_forAvatar: name_forAvatar,
+          svgCode: svgCode_others,
+        },
+      ]);
 
       // scroll to the bottom
       words_ref.current.scrollTop = words_ref.current.scrollHeight;
@@ -48,7 +51,7 @@ function Display() {
     // "enter"
     if (!e.shiftKey && e.keyCode === 13) {
       // Don't make a line break when "enter"
-      e.cancelBubble=true;
+      e.cancelBubble = true;
       e.preventDefault();
       e.stopPropagation();
 
@@ -62,22 +65,18 @@ function Display() {
       // send msg to backend
       send(msg);
 
-      // sender messages
-      words_ref.current.innerHTML =
-        words_ref.current.innerHTML +
-        '<div class="infoB">' +
-        name +
-        "&nbsp;" +
-        date +
-        "</div>" +
-        '<div class="btalk">' +
-        "<span>" +
-        msg +
-        "</span>" +
-        '<div class="avatarB">' +
-        svgCode_me +
-        "</div>" +
-        "</div>";
+      setItems((arr: any) => [
+        ...arr,
+        {
+          info: "infoB",
+          talk: "btalk",
+          avatar: "avatarB",
+          time: date,
+          message: msg,
+          name_forAvatar: name,
+          svgCode: svgCode_me,
+        },
+      ]);
 
       // scroll to the bottom
       words_ref.current.scrollTop = words_ref.current.scrollHeight;
@@ -94,8 +93,7 @@ function Display() {
   return (
     <div className="area">
       <div className="show" ref={words_ref}>
-        <div className="atalk"></div>
-        <div className="btalk"></div>
+        <Msg items={items} />
       </div>
       <br />
       <div>
