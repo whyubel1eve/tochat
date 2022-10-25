@@ -42,8 +42,6 @@ function Display() {
         },
       ]);
 
-      // scroll to the bottom
-      words_ref.current.scrollTop = words_ref.current.scrollHeight;
     });
   };
 
@@ -78,9 +76,6 @@ function Display() {
         },
       ]);
 
-      // scroll to the bottom
-      words_ref.current.scrollTop = words_ref.current.scrollHeight;
-
       // reset input area
       e.target.value = "";
     }
@@ -93,7 +88,7 @@ function Display() {
   return (
     <div className="area">
       <div className="show" ref={words_ref}>
-        <Msg items={items} />
+        <Msg items={items} words_ref={words_ref} />
       </div>
       <br />
       <div>

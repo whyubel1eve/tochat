@@ -1,4 +1,12 @@
+import { useEffect } from "react";
+
 export default function Msg(props: any) {
+  
+  // scroll to the bottom
+  useEffect(() => {
+    props.words_ref.current.scrollTop = props.words_ref.current.scrollHeight;
+  });
+
   const msg_items = props.items.map((item: any, index: any) => {
     return (
       <div key={index}>
